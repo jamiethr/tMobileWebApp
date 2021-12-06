@@ -1,6 +1,8 @@
 # tMobileWebApp
 
-![t mobile demo](https://user-images.githubusercontent.com/74883500/144858727-6f2b5f17-3b2e-41f1-9ffa-fc2c347797e3.gif)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/74883500/144858727-6f2b5f17-3b2e-41f1-9ffa-fc2c347797e3.gif" alt="animated" />
+</p>
 
 ## About
 
