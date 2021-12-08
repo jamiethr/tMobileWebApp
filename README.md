@@ -20,3 +20,7 @@ The final result of the project was a fully-functioning web app with the followi
 - Login screen using Okta for authentication
 - Search, using MySQL backend DB
 - 2D tree to visualize the relationships between individuals in a search. Each node can be clicked on to reveal more information about an individual
+
+## Additional Notes
+
+While the original web app also included the MySQL DB, I decided not to include it in the release (for now, at least). This was done to protect the privacy of the inviduals working at T-Mobile, though no personal data (beyond names and org chart data) was ever stored in the project before the internship concluded.
