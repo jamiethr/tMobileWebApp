@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- <style> body { margin: 0; } </style> -->
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
+
+        <link type="text/css" rel="stylesheet" href= "{{ url_for('static',filename='styles/style.css') }}">
+    
+        <script src="//unpkg.com/force-graph"></script>
+        <!--<script src="../../dist/force-graph.js"></script>-->
+        
+    </head>
+    <body>
+
+        <div class=topbar id="top_bar">
+            <!-- <div class=search>
+                <label for="search_bar">Search:</label>
+                <form method="post" action="#">
+                    <input type="text" placeholder="Enter a name..." id="search_bar" name="search_text"}>
+                    <button type="submit" id="search_button" name="go" value="GO">Go</button>
+                </form>
+                <div class=search_text id="current_search">
+                    {% if (search_q != "") and (search_q != None) %}
+                        <header>Current search: {{search_q}}</header>
+                        
+                        {% if (result != "") and (result != None) %}
+                            <header>Current result: {{result}} </header>
+                        {% else %}
+                            <header>No matches found in the database</header>
+                        {% endif %}   
+
+                    {% endif %}
+                </div>
+            </div> -->
+            <div class=okta_buttons>
+                <button onclick="location.href='/login'" type="button" id="log_in_button">Login</button>
+                <button onclick="location.href='/logout'" type="button" id="log_out_button">Log out</button>
+            </div>
+        </div>
+
+        <div class=login_menu id="login_menu">
+            <div class=login_mess id="login_message">
+                <header>Please log in to begin</header>
+            </div>
+            <h1 id=title >Welcome to the Organizer Tool</h1>
+        </div>
+
+    </body>
+</html>>

@@ -1,0 +1,27 @@
+services:
+    # mysql:
+    #     image: "mysql/mysql-server:latest"
+    #     ports:
+    #         - "3306:3306"
+    #     volumes:
+    #         - ./my.cnf:/etc/my.cnf
+    
+    mysql:
+        image: mariadb:10.1.19
+        ports:
+            - 8083:3306
+        volumes:
+            - ./mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: wp
+   
+    backend:
+        build: ./pyth_org
+        ports:
+            - "5000:5000"
+        # command:  tail -F anything
+        depends_on:
+            - mysql
+        links:
+            - "mysql"
+        

@@ -1,0 +1,78 @@
+<div class="node_det_top_text">
+    <a style="font-family: boldTitle; font-size: 16px;">Details For {{ node.split("_")[0] + " " + node.split("_")[1] }}</a> 
+    {% if data != None %}
+        <label id="node_detail_list" style="padding: 10px 20px 10px 20px;">
+            {% for item in data.keys() %}
+                {% if (data[item] != "") and (data[item] != None) %}
+                    <!-- <pre>{{ item }}:&emsp;{% if "@T-Mobile.com" in data[item] %}<a href="mailto: {{ data[item] }}"><span>{{ data[item] }}</span></a>{% else %}{{ data[item] }}{% endif %}</pre> -->
+
+                    {% if "@T-Mobile.com" in data[item] %}
+                        <pre>{{ item }}:&emsp;<a href="mailto: {{ data[item] }}" style="display: inline-block; min-width: 100px;"><span>{{ data[item] }}</span></a><br></pre>
+                    {% elif "://" in data[item] %}
+                        <pre style="text-align: left !important;">{{ item }}:</pre>
+                        {% for url in data[item].split(",") %}
+                            <!-- <iframe src="{{ url }}&output=embed" height="150" width="250"></iframe><br> -->
+                            <a href="{{ url }}"><span>{{ url }}</span></a><br>
+                        {% endfor %}
+                    {% else %}
+                        <pre style="white-space: nowrap;">{{ item }}:&nbsp;<a style="white-space: nowrap; font-size: 12px;">{{ data[item] }}</a></pre>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </label>
+    {% else %}
+        <label id="node_detail_empty" style="padding: 10px 20px; font-family: regTitle;">
+            <br><br>Visit {{ node.split("_")[0] + " " + node.split("_")[1] }}'s page for more details<br>
+        </label>
+    {% endif %}
+
+    <form method="post" action="#">
+        {% if ":" in node %}
+            <br><a style="font-family: boldTitle; padding: 10px 20px;">Visit {{ node.split(":")[1].split("_")[0] + " " + node.split(":")[1].split("_")[1] }}'s Page</a> <br>
+        {% else %}
+            <br><a style="font-family: boldTitle; padding: 10px 20px;">Visit {{ node.split("_")[0] + " " + node.split("_")[1] }}'s Page</a> <br>
+        {% endif %}
+        <button type="submit" id="visit_node_page" name="go" value="visit_node_page">Submit</button>
+    </form>
+
+</div>
+
+<script type=text/javascript>
+    function getDictValue(selectObject) {
+        var dict = {{ data }};
+        console.log('data is: ', dict);
+        return dict[selectObject.value];
+    }
+</script>
+
+{% if nodeUserMatches %}
+<div class="node_det_middle_text" style="text-align: center; display: inline-block;">
+
+    {% if data != None %}
+        {% if (isCustData) %}
+            <a style="font-family: boldTitle;">Enter comma-separated custom data:</a> <br>
+            <form method="post" action="#">
+                <select id="col_sel" name="col_sel" onchange="var dict = {{ data }};
+                                                              document.getElementById('cust_dat_input').value = dict[this.value];">
+
+
+                    {% if column_names != None %}
+                        {% for i in col_name_len %}
+                            <option value="{{ formatted_column_names[i] }}">{{ formatted_column_names[i] }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <input type="text" id="cust_dat_input" name="cust_data" placeholder="E.g. Title: Senior Manager, Skill: Python, ...">
+                <button type="submit" id="submit_cust_data" name="go" value="submit_cust_data">Submit</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% else %}
+    <form method="post" action="#">
+        <a style="font-family: boldTitle; padding: 10px 20px;">Add Custom Data for Node</a> <br>
+        <button type="submit" id="req_cust_data" name="go" value="req_cust_data">Submit</button>
+    </form>
+
+{% endif %}

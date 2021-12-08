@@ -1,0 +1,165 @@
+<!-- 
+    2D tree combined with Sakari's UI and interface
+    
+    sample code from: https://github.com/vasturiano/force-graph/blob/master/example/basic/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- <style> body { margin: 0; } </style> -->
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
+
+        <link type="text/css" rel="stylesheet" href= "{{ url_for('static',filename='styles/style.css') }}">
+    
+        <script src="//unpkg.com/force-graph"></script>
+        <!--<script src="../../dist/force-graph.js"></script>-->
+        
+    </head>
+    
+    <body>
+
+        <div id="graph"></div>
+    
+        <!-- OLD SCRIPT FOR RANDOM TREE W/O TEXT <script>
+        // Random tree
+        const N = 300;
+        const gData = {
+            nodes: [...Array(N).keys()].map(i => ({ id: i })),
+            links: [...Array(N).keys()]
+            .filter(id => id)
+            .map(id => ({
+                source: id,
+                target: Math.round(Math.random() * (id-1))
+            }))
+        };
+
+    
+        const Graph = ForceGraph()
+            (document.getElementById('graph'))
+            .linkDirectionalParticles(2)
+            .graphData(gData);
+        </script> -->
+
+        <!-- this label gets rendered via the javascript below. It's passed `data`, a dict., from server.py -->
+        
+
+        <div id="node_details"></div>
+
+        <div id="back_button_container">
+            {% if render_back_bttn %}
+                <form>
+                    <input id="back_button" type="button" value="Back" onclick="history.back()">
+                </form>
+            {% endif %}
+        </div>
+
+        <div id="multi_results_list">
+            {% if multi_list_src %}
+                <form method="post" action="#">
+                    <a style="font-family: boldTitle; color: #E20074; font-size: 19px;">Multiple results found!</a><br>
+                    <a id="multi_results_title">Select user from search:</a><br>
+                        <select id="mult_list" name="mult_list" onchange="">
+                            {% for item in multi_list_src %}
+                                <option value="{{ item[1] }}">{{ item[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    <button type="submit" id="submit_multi_name" name="go" value="submit_multi_name">Submit</button>
+                </form>
+            {% endif %}
+        </div>
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type=text/javascript>
+            fetch('{{ url_for('giveJSON') }}').then(res => res.json()).then(data => {
+                const Graph = ForceGraph()
+                (document.getElementById('graph'))
+                    .graphData(data)
+                    .nodeId('id')
+                    .nodeAutoColorBy('group')
+                    
+                    // click on node for more information
+                    .onNodeClick(node => {
+                        // data we send to the server
+                        $.ajax({
+                            url:    '{{ url_for('giveNodeData') }}',
+                            type:   "GET",
+                            data:   {"node":node.id},
+                            success: function(response){
+                                $("#node_details").html(response)
+                            }
+                            //FIXME insert error handler here
+                        })
+                        // zoom in on the node
+                        Graph.centerAt(node.x, node.y, 500)
+                        Graph.zoom(2, 1500)
+                        // set padding of the element
+                        document.getElementById("node_details").style.padding = "100px";
+                    })
+
+                    .nodeCanvasObject((node, ctx, globalScale) => {
+                    const label = (node.id.split("_")[0] + " " + node.id.split("_")[1]); //node.id;
+                    const fontSize = 12/globalScale;
+                    ctx.font = `${fontSize}px Sans-Serif`;
+                    const textWidth = ctx.measureText(label).width;
+                    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = node.color;
+                    ctx.fillText(label, node.x, node.y);
+
+                    node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+                    })
+                    .nodePointerAreaPaint((node, color, ctx) => {
+                    ctx.fillStyle = color;
+                    const bckgDimensions = node.__bckgDimensions;
+                    bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+                    });
+                });
+          </script>
+
+        <div class=topbar id="top_bar">
+            <div class=search>
+                <!-- <label for="search_bar">Search:</label> -->
+                <form method="post" action="#">
+                    <input type="text" placeholder="Enter a name..." id="search_bar" name="search_text"}>
+                    <button type="submit" id="search_button" name="go" value="GO">Go</button>                    
+                </form>
+
+                <div class=search_text id="current_search">
+                    <!-- This is a Flask if-statement. See Flask templates for details -->
+                    <!-- if we have a valid query, display it -->
+                    {% if (search_q != "") and (search_q != None) %}
+                        <header>Current search: {{search_q}}</header>
+                    {% elif search_q == "" %}
+                        <header>Invalid search</header>
+                    {% endif %}
+                </div>
+
+                <!-- if we have a valid query, display it -->
+                <div class=search_subtitle id="search_subtitle">
+                    {% if (result != "") and (result != None) %}
+                        <!-- <a>Current result: {{result}} </a> -->
+                    {% elif node_num_flag %}
+                        <a>Too many nodes! Data truncated to local maximum</a>
+                    {% elif result == "" %}
+                        <a>No matches found in the database</a>
+                    {% endif %}  
+                </div> 
+            </div>
+            <div class=okta_buttons>
+                <button onclick="location.href='/login'" type="button" id="home_button">Organizer Home</button>
+                <button onclick="location.href='/logout'" type="button" id="log_out_button">Log out</button>
+            </div>
+        </div>
+        
+
+    </body>
+</html>
